@@ -10,11 +10,15 @@ export const store = new Vuex.Store({
     catalogData: {},
     sellers: [],
     manufacturers: [],
-    pointFactors: []
+    pointFactors: [],
+    pointFactorsInitial: []
   },
   mutations: {
     SET_POINT_FACTORS: (state, payload) => {
       state.pointFactors = payload;
+    },
+    SET_POINT_FACTORS_INITIAL: (state, payload) => {
+      state.pointFactorsInitial = payload;
     },
     SET_CATALOGS: (state, payload) => {
       state.catalogs = payload;
@@ -57,6 +61,9 @@ export const store = new Vuex.Store({
     POINT_FACTORS: state => {
       return state.pointFactors;
     },
+    POINT_FACTORS_INITIAL: state => {
+      return state.pointFactorsInitial;
+    },
     CATALOG_DATA: state => {
       return state.catalogData;
     }
@@ -82,17 +89,17 @@ export const store = new Vuex.Store({
 
       let pointFactors = [];
       factors.data.forEach((item) => {
-        const propsOfCatalog = context.state.catalogs.find( (element) => element.id == item.catalogId).propsFlattened;
+        const propsOfCatalog = context.state.catalogs.find( (element) => element.id == item.catalogId ).propsFlattened;
 
         let factorsGroups = [];
 
-        for(let i in item.factorsGroups) {
+        for( let i in item.factorsGroups ) {
           let factorsGroup = item.factorsGroups[i];
 
           let factors = [];
           factorsGroup.factors.forEach( (factor) => {
             //we need to specify all of the values of the corresponding props of catalog
-            let propValues = propsOfCatalog.find( prop => prop.id == factor.id).values;
+            let propValues = propsOfCatalog.find( prop => prop.id == factor.id ).values;
             propValues.forEach (propValue => {
               let factorValue = factor.values.find( value => value.id == propValue.id);
               if( factorValue && factorValue.weight > 0 ) {
@@ -122,7 +129,9 @@ export const store = new Vuex.Store({
         });
       });
       context.commit('SET_POINT_FACTORS', pointFactors);      
+      context.commit('SET_POINT_FACTORS_INITIAL', JSON.parse(JSON.stringify(pointFactors)));      
     },
+    /*
     GET_POINT_FACTORS: async (context) => {
       let {data} = await axios.get('https://mebel.ru/tools/api/point-system/factors/');
       let pointFactors = [];
@@ -162,6 +171,7 @@ export const store = new Vuex.Store({
       let {data} = await axios.get('https://mebel.ru/tools/api/point-system/catalogs/');
       context.commit('SET_CATALOGS', data);
     },
+    */
     GET_CATALOG_DATA: (context, payload) => {
       return new Promise( (resolve) => {
         axios.get('https://mebel.ru/tools/api/point-system/products/?catalog=' + payload.catalogId)

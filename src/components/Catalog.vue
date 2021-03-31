@@ -10,13 +10,14 @@
       sort-by="points"
       sort-desc
     >
-
+      <template v-slot:item.name="{ item }">
+        <a :href="`https://mebel.ru${item.url}`" target="_blank">{{ item.name }}</a>
+      </template>
     </v-data-table>
   </v-container>
 </template>
 
 <script>
-  //import axios from 'axios';
   const loadCatalog = async function() {
     this.catalogData = [];
     if(this.$store.getters.CATALOG_DATA[this.catalogId] == undefined) {
@@ -56,24 +57,22 @@
                   let propId = factor.id;
 
                   let productValue = product.propValues[propId];
-                  console.log(productValue);
 
-                  if(! (productValue instanceof Array) ) {
-                    productValue = [productValue];
+                  if( productValue instanceof Array ) {
+                    productValue = productValue[0];
                   }
 
                   let pointsFromFactor = 0;
-                  productValue.forEach( (productValueItem) => {
-                    let factorValue = factor.values.find( value => value.id == productValueItem);
 
-                    if( factorValue !== undefined ) {
-                      let factorValueWeight = factorValue.weight;
+                  let factorValue = factor.values.find( value => value.id == productValue );
 
-                      if( factorValueWeight > 0 ) {
-                        pointsFromFactor = Math.max( pointsFromFactor, group.weight * factorValueWeight / 100);
-                      }
+                  if( factorValue !== undefined ) {
+                    let factorValueWeight = factorValue.weight;
+
+                    if( factorValueWeight > 0 ) {
+                      pointsFromFactor = group.weight * factorValueWeight / 100;
                     }
-                  });
+                  }
 
                   //добавляем расшифровку по факторам
                   pointsByGroups[group.id].pointsByFactors[factor.id] = {
@@ -93,6 +92,7 @@
           result.push({
             id: product.id,
             name: product.name,
+            url: product.url,
             sellerName: product.sellerName,
             manufacturerName: product.manufacturerName,
             price: product.price,
