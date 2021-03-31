@@ -70,7 +70,7 @@
                     let factorValueWeight = factorValue.weight;
 
                     if( factorValueWeight > 0 ) {
-                      pointsFromFactor = group.weight * factorValueWeight / 100;
+                      pointsFromFactor = group.weight * factor.weight * factorValueWeight / 10000;
                     }
                   }
 
